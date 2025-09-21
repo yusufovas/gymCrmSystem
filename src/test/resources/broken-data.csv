@@ -1,0 +1,2 @@
+userId,firstName,lastName,username,password,isActive,dateOfBirth,address
+1,Alice,Williams,alice.williams,pass123,true,broken-date-lol,123 Main St

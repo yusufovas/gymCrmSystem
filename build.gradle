@@ -1,0 +1,51 @@
+plugins {
+    id 'java'
+    id 'application'
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
+
+application {
+    mainClass = 'code.Main'
+}
+
+group = 'code'
+version = '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // Spring Core
+    implementation 'org.springframework:spring-core:6.1.13'
+    implementation 'org.springframework:spring-context:6.1.13'
+    implementation 'org.springframework:spring-beans:6.1.13'
+    implementation 'jakarta.annotation:jakarta.annotation-api:2.1.1'
+
+    implementation 'com.opencsv:opencsv:5.9'
+
+    // Logging
+    implementation 'org.apache.logging.log4j:log4j-api:2.24.1'
+    implementation 'org.apache.logging.log4j:log4j-core:2.24.1'
+
+    //Lombok
+    compileOnly 'org.projectlombok:lombok:1.18.34'
+    annotationProcessor 'org.projectlombok:lombok:1.18.34'
+
+    // Testing
+    testImplementation 'org.springframework:spring-test:6.1.13'
+    testImplementation 'org.mockito:mockito-core:5.19.0'
+    testImplementation 'org.assertj:assertj-core:3.26.0'
+
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.11.3'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.11.3'
+}
+
+test {
+    useJUnitPlatform()
+}

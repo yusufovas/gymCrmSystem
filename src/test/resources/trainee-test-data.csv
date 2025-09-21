@@ -1,0 +1,3 @@
+userId,firstName,lastName,username,password,isActive,dateOfBirth,address
+1,John,Doe,john.doe,pass123,true,2000-01-01,123 Street
+2,Jane,Smith,jane.smith,pass456,false,1999-05-05,456 Avenue
