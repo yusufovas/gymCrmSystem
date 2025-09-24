@@ -4,15 +4,16 @@ import code.dao.TraineeDao;
 import code.model.Trainee;
 import code.utils.PasswordGenerator;
 import code.utils.UsernameGenerator;
+import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 
 @Service
+@RequiredArgsConstructor
 public class TraineeService {
     private TraineeDao traineeDao;
     private static final Logger log = LogManager.getLogger(TraineeService.class);
