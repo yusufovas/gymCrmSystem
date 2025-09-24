@@ -20,32 +20,42 @@ repositories {
     mavenCentral()
 }
 
-dependencies {
-    // Spring Core
-    implementation 'org.springframework:spring-core:6.1.13'
-    implementation 'org.springframework:spring-context:6.1.13'
-    implementation 'org.springframework:spring-beans:6.1.13'
-    implementation 'jakarta.annotation:jakarta.annotation-api:2.1.1'
-
-    implementation 'com.opencsv:opencsv:5.9'
-
-    // Logging
-    implementation 'org.apache.logging.log4j:log4j-api:2.24.1'
-    implementation 'org.apache.logging.log4j:log4j-core:2.24.1'
-
-    //Lombok
-    compileOnly 'org.projectlombok:lombok:1.18.34'
-    annotationProcessor 'org.projectlombok:lombok:1.18.34'
-
-    // Testing
-    testImplementation 'org.springframework:spring-test:6.1.13'
-    testImplementation 'org.mockito:mockito-core:5.19.0'
-    testImplementation 'org.assertj:assertj-core:3.26.0'
-
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.11.3'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.11.3'
+ext {
+    springVersion     = '6.1.13'
+    jakartaVersion    = '2.1.1'
+    opencsvVersion    = '5.9'
+    log4jVersion      = '2.24.1'
+    lombokVersion     = '1.18.34'
+    mockitoVersion    = '5.19.0'
+    assertjVersion    = '3.26.0'
+    junitVersion      = '5.11.3'
 }
 
+dependencies {
+    // Spring Core
+    implementation group: 'org.springframework', name: 'spring-core', version: springVersion
+    implementation group: 'org.springframework', name: 'spring-context', version: springVersion
+    implementation group: 'org.springframework', name: 'spring-beans', version: springVersion
+    implementation group: 'jakarta.annotation', name: 'jakarta.annotation-api', version: jakartaVersion
+
+    //OpenCsv
+    implementation group: 'com.opencsv', name: 'opencsv', version: opencsvVersion
+
+    // Logging
+    implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: log4jVersion
+    implementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: log4jVersion
+
+    //Lombok
+    compileOnly group: 'org.projectlombok', name: 'lombok', version: lombokVersion
+    annotationProcessor group: 'org.projectlombok', name: 'lombok', version: lombokVersion
+
+    // Testing
+    testImplementation group: 'org.springframework', name: 'spring-test', version: springVersion
+    testImplementation group: 'org.mockito', name: 'mockito-core', version: mockitoVersion
+    testImplementation group: 'org.assertj', name: 'assertj-core', version: assertjVersion
+    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: junitVersion
+    testRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: junitVersion
+}
 test {
     useJUnitPlatform()
 }
