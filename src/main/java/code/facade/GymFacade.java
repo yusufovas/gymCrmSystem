@@ -3,11 +3,14 @@ package code.facade;
 import code.service.TraineeService;
 import code.service.TrainerService;
 import code.service.TrainingService;
+import jakarta.annotation.PostConstruct;
+import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Component;
 
 @Component
+@RequiredArgsConstructor
 public class GymFacade {
     private static final Logger log = LogManager.getLogger(GymFacade.class);
 
@@ -15,12 +18,8 @@ public class GymFacade {
     private final TrainerService trainerService;
     private final TrainingService trainingService;
 
-    public GymFacade(TraineeService traineeService,
-                     TrainerService trainerService,
-                     TrainingService trainingService) {
-        this.traineeService = traineeService;
-        this.trainerService = trainerService;
-        this.trainingService = trainingService;
+    @PostConstruct
+    public void init() {
         log.info("GymFacade initialized with TraineeService, TrainerService, and TrainingService");
     }
 
