@@ -1,32 +1,36 @@
 package code.model;
 
-import com.opencsv.bean.CsvBindByName;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.ToString;
+import lombok.experimental.SuperBuilder;
 
+import java.util.UUID;
+
+@Getter
+@Setter
+@SuperBuilder
 @ToString
 @EqualsAndHashCode
 @NoArgsConstructor
+@Entity
+@Table(name = "training_type")
 public class TrainingType {
-    @CsvBindByName
-    private int trainingTypeId;
-    @CsvBindByName
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "training_type_id")
+    private UUID trainingTypeId;
+
+    @Column(name = "training_type_name", nullable = false, unique = true)
     private String trainingTypeName;
-
-    public int getTrainingTypeId() {
-        return trainingTypeId;
-    }
-
-    public void setTrainingTypeId(int trainingTypeId) {
-        this.trainingTypeId = trainingTypeId;
-    }
-
-    public String getTrainingTypeName() {
-        return trainingTypeName;
-    }
-
-    public void setTrainingTypeName(String trainingTypeName) {
-        this.trainingTypeName = trainingTypeName;
-    }
 }
+

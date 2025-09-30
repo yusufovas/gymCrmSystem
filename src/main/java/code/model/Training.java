@@ -1,86 +1,56 @@
 package code.model;
 
-import com.opencsv.bean.CsvBindByName;
-import com.opencsv.bean.CsvDate;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.ToString;
+import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDate;
+import java.util.UUID;
 
+@Getter
+@Setter
+@SuperBuilder
 @ToString
 @EqualsAndHashCode
 @NoArgsConstructor
+@Entity
+@Table(name = "training")
 public class Training {
-    @CsvBindByName
-    private int trainingId;
-    @CsvBindByName
-    private int traineeId;
-    @CsvBindByName
-    private int trainerId;
-    @CsvBindByName
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "training_id")
+    private UUID trainingId;
+
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "trainee_id", nullable = false)
+    private Trainee trainee;
+
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "trainer_id", nullable = false)
+    private Trainer trainer;
+
+    @Column(name = "training_name", nullable = false)
     private String trainingName;
-    @CsvBindByName
-    private String trainingDuration;
-    @CsvDate("yyyy-MM-dd")
-    @CsvBindByName
+
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "training_type_id", nullable = false)
+    private TrainingType trainingType;
+
+    @Column(name = "training_date", nullable = false)
     private LocalDate trainingDate;
-    @CsvBindByName
-    private String trainingType;
 
-    public int getTrainingId() {
-        return trainingId;
-    }
-
-    public void setTrainingId(int trainingId) {
-        this.trainingId = trainingId;
-    }
-
-    public int getTraineeId() {
-        return traineeId;
-    }
-
-    public void setTraineeId(int traineeId) {
-        this.traineeId = traineeId;
-    }
-
-    public int getTrainerId() {
-        return trainerId;
-    }
-
-    public void setTrainerId(int trainerId) {
-        this.trainerId = trainerId;
-    }
-
-    public String getTrainingName() {
-        return trainingName;
-    }
-
-    public void setTrainingName(String trainingName) {
-        this.trainingName = trainingName;
-    }
-
-    public LocalDate getTrainingDate() {
-        return trainingDate;
-    }
-
-    public void setTrainingDate(LocalDate trainingDate) {
-        this.trainingDate = trainingDate;
-    }
-
-    public String getTrainingDuration() {
-        return trainingDuration;
-    }
-
-    public void setTrainingDuration(String trainingDuration) {
-        this.trainingDuration = trainingDuration;
-    }
-
-    public String getTrainingType() {
-        return trainingType;
-    }
-
-    public void setTrainingType(String trainingType) {
-        this.trainingType = trainingType;
-    }
+    @Column(name = "training_duration", nullable = false)
+    private Integer trainingDuration;
 }

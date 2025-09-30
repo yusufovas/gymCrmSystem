@@ -1,74 +1,39 @@
 package code.model;
 
-import com.opencsv.bean.CsvBindByName;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import jakarta.persistence.*;
+import lombok.*;
 import lombok.experimental.SuperBuilder;
+
+import java.util.UUID;
 
 @ToString
 @EqualsAndHashCode
 @SuperBuilder
 @NoArgsConstructor
-public abstract class User {
-    @CsvBindByName
-    private int userId;
-    @CsvBindByName
+@Setter
+@Getter
+@Entity
+@Table(name = "users")
+public class User {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "user_id")
+    private UUID userId;
+
+    @Column(name = "firstname", nullable = false)
     private String firstName;
-    @CsvBindByName
+
+    @Column(name = "lastname", nullable = false)
     private String lastName;
-    @CsvBindByName
+
+    @Column(name = "username", nullable = false, unique = true)
     private String username;
-    @CsvBindByName
+
+    @Column(name = "password", nullable = false)
     private String password;
-    @CsvBindByName
-    private boolean isActive;
 
-    public int getUserId() {
-        return userId;
-    }
+    @Column(name = "is_active", nullable = false)
+    private boolean isActive = true;
 
-    public void setUserId(int userId) {
-        this.userId = userId;
-    }
-
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public boolean isActive() {
-        return isActive;
-    }
-
-    public void setActive(boolean active) {
-        isActive = active;
-    }
 }

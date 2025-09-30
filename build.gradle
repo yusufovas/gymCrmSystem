@@ -22,13 +22,14 @@ repositories {
 
 ext {
     springVersion     = '6.1.13'
-    jakartaVersion    = '2.1.1'
-    opencsvVersion    = '5.9'
+    jakartaVersion    = '3.1.0'
     log4jVersion      = '2.24.1'
     lombokVersion     = '1.18.34'
     mockitoVersion    = '5.19.0'
     assertjVersion    = '3.26.0'
     junitVersion      = '5.11.3'
+    h2Version         = '2.2.224'
+    hibernateVersion  = '6.4.4.Final'
 }
 
 dependencies {
@@ -37,9 +38,15 @@ dependencies {
     implementation group: 'org.springframework', name: 'spring-context', version: springVersion
     implementation group: 'org.springframework', name: 'spring-beans', version: springVersion
     implementation group: 'jakarta.annotation', name: 'jakarta.annotation-api', version: jakartaVersion
+    implementation group: 'jakarta.persistence', name: 'jakarta.persistence-api', version: jakartaVersion
+    implementation group: 'org.springframework', name: 'spring-jdbc', version: springVersion
+    implementation group: 'org.springframework', name: 'spring-orm', version: springVersion
 
-    //OpenCsv
-    implementation group: 'com.opencsv', name: 'opencsv', version: opencsvVersion
+    // Hibernate ORM
+    implementation group: 'org.hibernate.orm', name: 'hibernate-core', version: hibernateVersion
+
+    // H2 Database
+    runtimeOnly group: 'com.h2database', name: 'h2', version: h2Version
 
     // Logging
     implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: log4jVersion
@@ -56,6 +63,11 @@ dependencies {
     testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: junitVersion
     testRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: junitVersion
 }
+
+repositories {
+    mavenCentral()
+}
+
 test {
     useJUnitPlatform()
 }
