@@ -1,77 +1,50 @@
 package code.service;
 
+import code.dao.BaseDao;
 import code.dao.TraineeDao;
+import code.dao.TrainingDao;
 import code.model.Trainee;
-import code.utils.PasswordGenerator;
-import code.utils.UsernameGenerator;
+import code.model.User;
 import lombok.RequiredArgsConstructor;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-public class TraineeService {
-    private TraineeDao traineeDao;
-    private static final Logger log = LogManager.getLogger(TraineeService.class);
+@Transactional
+public class TraineeService extends AbstractUserService<Trainee> {
 
-    @Autowired
-    public void setTraineeDao(TraineeDao traineeDao) {
-        this.traineeDao = traineeDao;
+    private final TraineeDao traineeDao;
+    private final TrainingDao trainingDao;
+
+    @Override
+    public BaseDao<Trainee, UUID> getDao() {
+        return traineeDao;
     }
 
-    public Trainee create(Trainee trainee) {
-        log.info("Creating trainee: {} {}", trainee.getFirstName(), trainee.getLastName());
-
-        String username = UsernameGenerator.generate(
-                trainee.getFirstName(),
-                trainee.getLastName(),
-                this::usernameExists
-        );
-        trainee.setUsername(username);
-        trainee.setPassword(PasswordGenerator.generate());
-
-        log.info("New Trainee created: {} {} {}", trainee.getFirstName(), trainee.getLastName(), trainee.getUsername());
-        return traineeDao.create(trainee);
+    @Override
+    protected void validate(Trainee trainee) {
+        if (trainee.getUser().getFirstName() == null || trainee.getUser().getFirstName().isBlank()) {
+            throw new IllegalArgumentException("First name is required");
+        }
+        if (trainee.getUser().getLastName() == null || trainee.getUser().getLastName().isBlank()) {
+            throw new IllegalArgumentException("Last name is required");
+        }
+        if (trainee.getDateOfBirth() == null) {
+            throw new IllegalArgumentException("Date of birth is required");
+        }
     }
 
-    public Trainee update(Integer id, Trainee updTrainee) {
-        log.info("Updating trainee with id={}", id);
-
-        return traineeDao.findById(id)
-                .map(existing -> {
-                    existing.setFirstName(updTrainee.getFirstName());
-                    existing.setLastName(updTrainee.getLastName());
-                    existing.setDateOfBirth(updTrainee.getDateOfBirth());
-
-                    String newUsername = UsernameGenerator.generate(
-                            updTrainee.getFirstName(),
-                            updTrainee.getLastName(),
-                            this::usernameExists
-                    );
-                    existing.setUsername(newUsername);
-
-                    return traineeDao.create(existing);
-                })
-                .orElseThrow(() -> new RuntimeException("Trainee not found"));
+    @Override
+    protected void cascadeDeleteIfNeeded(Trainee trainee) {
+        trainingDao.findByTraineeAndCriteria(trainee.getUser().getUsername(), null, null, null, null)
+                .forEach(training -> trainingDao.delete(training.getTrainingId()));
     }
 
-    public void deleteProfile(Integer id) {
-        traineeDao.delete(id);
-        log.info("Trainee with id={} deleted", id);
-    }
-
-    public List<Trainee> getAll() {
-        log.info("Fetching trainees");
-        return traineeDao.findAll();
-    }
-
-    private boolean usernameExists(String username) {
-        return traineeDao.findAll().stream()
-                .anyMatch(t -> username.equals(t.getUsername()));
+    @Override
+    protected User getUser(Trainee entity) {
+        return entity.getUser();
     }
 }
-

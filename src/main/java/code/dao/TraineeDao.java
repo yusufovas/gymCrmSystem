@@ -1,14 +1,26 @@
 package code.dao;
 
 import code.model.Trainee;
-import code.storage.Storage;
+import org.hibernate.SessionFactory;
 import org.springframework.stereotype.Repository;
 
-@Repository
-public class TraineeDao extends AbstractDao<Trainee> {
-    private static final String NAMESPACE = "trainee";
+import java.util.Optional;
+import java.util.UUID;
 
-    public TraineeDao(Storage storage) {
-        super(storage, NAMESPACE, Trainee::getUserId, Trainee::setUserId);
+@Repository
+public class TraineeDao extends AbstractDao<Trainee, UUID> {
+    public TraineeDao(SessionFactory sessionFactory) {
+        super(sessionFactory, Trainee.class);
+    }
+
+    public Optional<Trainee> findByUsername(String username) {
+        return getSession()
+                .createQuery("from Trainee t where t.user.username = :username", Trainee.class)
+                .setParameter("username", username)
+                .uniqueResultOptional();
+    }
+
+    public void deleteByUsername(String username) {
+        findByUsername(username).ifPresent(e -> getSession().remove(e));
     }
 }

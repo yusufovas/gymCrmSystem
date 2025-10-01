@@ -1,4 +1,0 @@
-userId,firstName,lastName,username,password,isActive,dateOfBirth,address
-1,Alice,Williams,Alice.Williams,alice123,true,2000-05-14,123 Main St
-2,Bob,Brown,bbrown,bob123,true,1998-11-20,456 Oak Ave
-3,Clara,Evans,cevans,clara456,false,2002-03-07,789 Pine Rd

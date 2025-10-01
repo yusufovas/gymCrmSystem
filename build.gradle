@@ -37,7 +37,6 @@ dependencies {
     implementation group: 'org.springframework', name: 'spring-core', version: springVersion
     implementation group: 'org.springframework', name: 'spring-context', version: springVersion
     implementation group: 'org.springframework', name: 'spring-beans', version: springVersion
-    implementation group: 'jakarta.annotation', name: 'jakarta.annotation-api', version: jakartaVersion
     implementation group: 'jakarta.persistence', name: 'jakarta.persistence-api', version: jakartaVersion
     implementation group: 'org.springframework', name: 'spring-jdbc', version: springVersion
     implementation group: 'org.springframework', name: 'spring-orm', version: springVersion

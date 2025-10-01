@@ -8,4 +8,7 @@ public interface BaseDao<T, ID> {
     Optional<T> findById(ID id);
     List<T> findAll();
     void delete(ID id);
+    T update(T entity);
+
+    Optional<T> findByUsername(String username);
 }

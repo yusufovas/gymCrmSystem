@@ -1,4 +1,0 @@
-userId,firstName,lastName,username,password,isActive,specialization
-1,John,Doe,johndoe,pass123,true,Strength
-2,Jane,Smith,jsmith,secret,true,Cardio
-3,Mike,Johnson,mjohnson,admin123,false,HIIT

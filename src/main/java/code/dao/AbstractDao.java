@@ -1,63 +1,50 @@
 package code.dao;
 
-import code.storage.Storage;
+import lombok.AllArgsConstructor;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.BiConsumer;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
-public abstract class AbstractDao<T> implements BaseDao<T> {
-    private final Storage storage;
-    private final String namespace;
-    private final Function<T, Integer> idGetter;
-    private final BiConsumer<T, Integer> idSetter;
-    private final AtomicInteger counter = new AtomicInteger(0);
+@Transactional
+@AllArgsConstructor
+public abstract class AbstractDao<T, ID> implements BaseDao<T, ID> {
 
-    protected AbstractDao(Storage storage, String namespace,
-                          Function<T, Integer> idGetter,
-                          BiConsumer<T, Integer> idSetter) {
-        this.storage = storage;
-        this.namespace = namespace;
-        this.idGetter = idGetter;
-        this.idSetter = idSetter;
+    private final SessionFactory sessionFactory;
+    private final Class<T> entityClass;
+
+    protected Session getSession() {
+        return sessionFactory.getCurrentSession();
     }
+
 
     @Override
     public T create(T entity) {
-        Integer id = idGetter.apply(entity);
-        if (id == null || id <= 0) {
-            id = counter.incrementAndGet();
-            idSetter.accept(entity, id);
-        }
-        storage.put(namespace, id, entity);
+        getSession().persist(entity);
         return entity;
     }
 
-
-    @SuppressWarnings("unchecked")
     @Override
-    public Optional<T> findById(Integer id) {
-        return Optional.ofNullable((T) storage.get(namespace, id));
+    public Optional<T> findById(ID id) {
+        return Optional.ofNullable(getSession().get(entityClass, id));
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public List<T> findAll() {
-        return storage.getDataMap()
-                .getOrDefault(namespace, Collections.emptyMap())
-                .values()
-                .stream()
-                .map(o -> (T) o)
-                .collect(Collectors.toList());
+        return getSession()
+                .createQuery("from " + entityClass.getSimpleName(),entityClass)
+                .getResultList();
     }
 
     @Override
-    public void delete(Integer id) {
-        Optional.ofNullable(storage.getDataMap().get(namespace))
-                .ifPresent(map -> map.remove(id));
+    public void delete(ID id) {
+        findById(id).ifPresent(e -> getSession().remove(e));
+    }
+
+    @Override
+    public T update(T entity) {
+        return (T) getSession().merge(entity);
     }
 }
