@@ -132,4 +132,9 @@ public class GymFacade {
                 || trainerService.getAll().stream()
                 .anyMatch(t -> t.getUser().getUsername().equals(username));
     }
+
+    @Transactional(readOnly = true)
+    public TraineeService getTraineeService() {
+        return traineeService;
+    }
 }

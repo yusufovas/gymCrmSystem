@@ -58,11 +58,11 @@ public class TrainingDao extends AbstractDao<Training, UUID> {
                 "join tr.trainee t " +
                 "join tr.trainer trn " +
                 "join tr.trainingType tt " +
-                "where t.username = :traineeUsername");
+                "where t.user.username = :traineeUsername");
 
         if (from != null) query.append(" and tr.trainingDate >= :from");
         if (to != null) query.append(" and tr.trainingDate <= :to");
-        if (trainerName != null && !trainerName.isBlank()) query.append(" and trn.lastName = :trainerName");
+        if (trainerName != null && !trainerName.isBlank()) query.append(" and trn.user.lastName = :trainerName");
         if (trainingType != null && !trainingType.isBlank()) query.append(" and tt.trainingTypeName = :trainingType");
 
         return query.toString();
@@ -74,11 +74,12 @@ public class TrainingDao extends AbstractDao<Training, UUID> {
         StringBuilder query = new StringBuilder("select tr from Training tr " +
                 "join tr.trainer trn " +
                 "join tr.trainee t " +
-                "where trn.username = :trainerUsername");
+                "where trn.user.username = :trainerUsername");
 
         if (from != null) query.append(" and tr.trainingDate >= :from");
         if (to != null) query.append(" and tr.trainingDate <= :to");
-        if (traineeName != null && !traineeName.isBlank()) query.append(" and t.lastName = :traineeName");
+        if (traineeName != null && !traineeName.isBlank())
+            query.append(" and t.user.lastName = :traineeName");
 
         return query.toString();
     }

@@ -1,43 +1,65 @@
-//package code.dao;
-//
-//import code.model.Trainer;
-//import code.storage.Storage;
-//import org.junit.jupiter.api.BeforeEach;
-//import org.junit.jupiter.api.Test;
-//
-//import java.util.List;
-//
-//import static org.junit.jupiter.api.Assertions.*;
-//
-//class TrainerDaoTest {
-//
-//    private TrainerDao trainerDao;
-//
-//    @BeforeEach
-//    void setUp() {
-//        Storage storage = new Storage();
-//        trainerDao = new TrainerDao(storage);
-//    }
-//
-//    @Test
-//    void testCreate() {
-//        Trainer trainer = new Trainer();
-//        trainer.setFirstName("Bob");
-//        trainer.setLastName("Johnson");
-//
-//        Trainer saved = trainerDao.create(trainer);
-//
-//        assertTrue(saved.getUserId() > 0);
-//    }
-//
-//    @Test
-//    void testFindAll() {
-//        trainerDao.create(new Trainer());
-//        trainerDao.create(new Trainer());
-//
-//        List<Trainer> trainers = trainerDao.findAll();
-//
-//        assertEquals(2, trainers.size());
-//    }
-//}
-//
+package code.dao;
+
+import code.config.Config;
+import code.model.Trainer;
+import code.model.User;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+@ExtendWith(SpringExtension.class)
+@ContextConfiguration(classes = Config.class)
+@Transactional
+class TrainerDaoTest {
+
+    @Autowired
+    private TrainerDao trainerDao;
+
+    private Trainer trainer;
+
+    @BeforeEach
+    void setUp() {
+        trainer = Trainer.builder()
+                .user(User.builder()
+                        .firstName("John")
+                        .lastName("Doe")
+                        .username("john.doe")
+                        .password("secret")
+                        .isActive(true)
+                        .build())
+                .specialization("Yoga")
+                .build();
+
+        trainerDao.create(trainer);
+    }
+
+    @Test
+    void testCreateAndFindById() {
+        Optional<Trainer> found = trainerDao.findById(trainer.getTrainerId());
+        assertTrue(found.isPresent());
+        assertEquals("John", found.get().getUser().getFirstName());
+    }
+
+    @Test
+    void testUpdate() {
+        trainer.getUser().setLastName("Smith");
+        Trainer updated = trainerDao.update(trainer);
+
+        assertEquals("Smith", updated.getUser().getLastName());
+    }
+
+    @Test
+    void testDeleteByUsername() {
+        trainerDao.deleteByUsername("john.doe");
+        assertTrue(trainerDao.findByUsername("john.doe").isEmpty());
+    }
+}

@@ -23,6 +23,8 @@ public abstract class AbstractUserService<T> {
 
     @Transactional
     public T create(T entity, Predicate<String> usernameExists) {
+        log.debug("Entering create() with entity={}", entity);
+
         validate(entity);
 
         User user = getUser(entity);
@@ -36,11 +38,17 @@ public abstract class AbstractUserService<T> {
         user.setActive(true);
 
         log.info("Creating profile for {}", user.getUsername());
-        return getDao().create(entity);
+
+        T created = getDao().create(entity);
+
+        log.debug("Created entity with ID={}", getUser(created).getUserId());
+
+        return created;
     }
 
     @Transactional
     public T update(UUID id, T updatedEntity, Predicate<String> usernameExists) {
+        log.debug("Updating entity with ID={}", id);
         return getDao().findById(id)
                 .map(existing -> {
                     validate(updatedEntity);
@@ -66,9 +74,12 @@ public abstract class AbstractUserService<T> {
 
     @Transactional
     public void deleteByUsername(String username) {
+        log.debug("Deleting user with username={}", username);
         T entity = getDao().findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User not found: " + username));
-
+                .orElseThrow(() -> {
+                    log.error("User not found: {}", username);
+                    return new RuntimeException("User not found: " + username);
+                });
         cascadeDeleteIfNeeded(entity);
         getDao().delete(getUser(entity).getUserId());
 
@@ -77,18 +88,29 @@ public abstract class AbstractUserService<T> {
 
     @Transactional(readOnly = true)
     public boolean authenticate(String username, String password) {
-        return getDao().findByUsername(username)
+        log.debug("Authenticating user={}", username);
+
+        boolean result = getDao().findByUsername(username)
                 .map(e -> getUser(e).getPassword().equals(password))
                 .orElse(false);
+
+        log.info("Authentication {} for user={}", result ? "successful" : "failed", username);
+        return result;
     }
 
     @Transactional
     public void changePassword(String username, String oldPassword, String newPassword) {
+        log.debug("Changing password for user={}", username);
+
         T entity = getDao().findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User not found: " + username));
+                .orElseThrow(() -> {
+                    log.error("User not found: {}", username);
+                    return new RuntimeException("User not found: " + username);
+                });
 
         User user = getUser(entity);
         if (!user.getPassword().equals(oldPassword)) {
+            log.error("Old password mismatch for username={}", username);
             throw new RuntimeException("Old password does not match for username=" + username);
         }
 
@@ -100,11 +122,17 @@ public abstract class AbstractUserService<T> {
 
     @Transactional
     public void toggleActive(String username, boolean activate) {
+        log.debug("Toggling active state for user={} to {}", username, activate);
+
         T entity = getDao().findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User not found: " + username));
+                .orElseThrow(() -> {
+                    log.error("User not found: {}", username);
+                    return new RuntimeException("User not found: " + username);
+                });
 
         User user = getUser(entity);
         if (user.isActive() == activate) {
+            log.warn("User={} already in desired state {}", username, activate);
             throw new RuntimeException("User already in desired state: " + (activate ? "active" : "inactive"));
         }
 
@@ -114,8 +142,8 @@ public abstract class AbstractUserService<T> {
         log.info("User={} is now {}", username, activate ? "active" : "inactive");
     }
 
-    @Transactional(readOnly = true)
     public List<T> getAll() {
+        log.debug("Fetching all entities of type={}", getClass().getSimpleName());
         return getDao().findAll();
     }
 }

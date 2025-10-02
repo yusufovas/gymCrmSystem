@@ -28,6 +28,7 @@ public class TrainingService {
 
     @Transactional
     public Training create(Training training) {
+        log.debug("Entering create() for training: {}", training);
         validateTraining(training);
         log.info("New training created: type={} date={} duration={}",
                 training.getTrainingType().getTrainingTypeName(),
@@ -38,7 +39,7 @@ public class TrainingService {
 
     @Transactional(readOnly = true)
     public List<Training> getAll() {
-        log.info("Fetching all trainings");
+        log.debug("Fetching all trainings");
         return trainingDao.findAll();
     }
 
@@ -48,6 +49,8 @@ public class TrainingService {
                                                  LocalDate to,
                                                  String trainerName,
                                                  String trainingType) {
+        log.info("Fetching trainings for trainee={} from={} to={} trainer={} type={}",
+                traineeUsername, from, to, trainerName, trainingType);
         return trainingDao.findByTraineeAndCriteria(traineeUsername, from, to, trainerName, trainingType);
     }
 
@@ -56,41 +59,59 @@ public class TrainingService {
                                                  LocalDate from,
                                                  LocalDate to,
                                                  String traineeName) {
+        log.info("Fetching trainings for trainer={} from={} to={} trainee={}",
+                trainerUsername, from, to, traineeName);
         return trainingDao.findByTrainerAndCriteria(trainerUsername, from, to, traineeName);
     }
 
     private void validateTraining(Training training) {
+        log.debug("Validating training={}", training);
+
         if (training == null) {
+            log.error("Validation failed: training is null");
             throw new IllegalArgumentException("Training cannot be null");
         }
 
         traineeDao.findById(training.getTrainee().getTraineeId())
-                .orElseThrow(() -> new IllegalArgumentException("Trainee does not exist"));
+                .orElseThrow(() -> {
+                    log.error("Validation failed: trainee not found for ID={}", training.getTrainee().getTraineeId());
+                    return new IllegalArgumentException("Trainee does not exist");
+                });
 
         trainerDao.findById(training.getTrainer().getTrainerId())
-                .orElseThrow(() -> new IllegalArgumentException("Trainer does not exist"));
+                .orElseThrow(() -> {
+                    log.error("Validation failed: trainer not found for ID={}", training.getTrainer().getTrainerId());
+                    return new IllegalArgumentException("Trainer does not exist");
+                });
 
         if (training.getTrainingType() == null) {
+            log.error("Validation failed: training type missing");
             throw new IllegalArgumentException("Training type must not be null");
         }
 
         if (training.getTrainingDuration() == null
                 || training.getTrainingDuration() <= 0
                 || training.getTrainingDuration() > 120) {
+            log.error("Validation failed: invalid training duration={}", training.getTrainingDuration());
             throw new IllegalArgumentException("Training duration must be between 1 and 120 minutes");
         }
 
         if (training.getTrainingDate() == null || !training.getTrainingDate().isAfter(LocalDate.now())) {
+            log.error("Validation failed: invalid training date={}", training.getTrainingDate());
             throw new IllegalArgumentException("Training date must be in the future");
         }
 
         if (training.getTrainee().getDateOfBirth() == null || !training.getTrainee().getDateOfBirth().isBefore(LocalDate.now())) {
+            log.error("Validation failed: trainee date of birth invalid={}", training.getTrainee().getDateOfBirth());
             throw new IllegalArgumentException("Trainee date of birth must be in the past");
         }
 
         Period age = Period.between(training.getTrainee().getDateOfBirth(), training.getTrainingDate());
         if (age.getYears() < 16) {
+            log.error("Validation failed: trainee too young, age={}", age.getYears());
             throw new IllegalArgumentException("Trainee must be at least 16 years old to attend the training");
         }
+
+        log.debug("Training validation successful");
     }
 }

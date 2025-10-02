@@ -34,9 +34,10 @@ public class HibernateConfig {
 
     private Properties hibernateProperties() {
         Properties props = new Properties();
-        props.put("hibernate.hbm2ddl.auto", "update");
+        props.put("hibernate.hbm2ddl.auto", "create-drop");
         props.put("hibernate.show_sql", "true");
         props.put("hibernate.format_sql", "true");
+        props.put("hibernate.hbm2ddl.import_files", "import.sql");
         return props;
     }
 }
