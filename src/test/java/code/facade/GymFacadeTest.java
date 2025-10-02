@@ -22,10 +22,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = Config.class)
@@ -139,11 +136,103 @@ class GymFacadeTest {
     }
 
     @Test
-    void testUnsupportedMethods() {
-        assertThrows(UnsupportedOperationException.class,
-                () -> facade.getUnassignedTrainersForTrainee("alice"));
+    void testGetUnassignedTrainersForTrainee() {
+        Trainee trainee = facade.createTraineeProfile(
+                Trainee.builder()
+                        .user(User.builder()
+                                .firstName("Alice")
+                                .lastName("Smith")
+                                .build())
+                        .dateOfBirth(LocalDate.of(2000, 1, 1))
+                        .address("Tashkent")
+                        .build()
+        );
 
-        assertThrows(UnsupportedOperationException.class,
-                () -> facade.updateTraineeTrainersList("alice", List.of(UUID.randomUUID())));
+        Trainer trainer1 = facade.createTrainerProfile(
+                Trainer.builder()
+                        .user(User.builder()
+                                .firstName("Bob")
+                                .lastName("Miller")
+                                .build())
+                        .specialization("Yoga")
+                        .build()
+        );
+
+        Trainer trainer2 = facade.createTrainerProfile(
+                Trainer.builder()
+                        .user(User.builder()
+                                .firstName("Emma")
+                                .lastName("Brown")
+                                .build())
+                        .specialization("Cardio")
+                        .build()
+        );
+
+        List<Trainer> unassignedBefore = facade.getUnassignedTrainersForTrainee(trainee.getUser().getUsername());
+        assertTrue(unassignedBefore.contains(trainer1));
+        assertTrue(unassignedBefore.contains(trainer2));
+
+        facade.updateTraineeTrainersList(
+                trainee.getUser().getUsername(),
+                List.of(trainer1.getTrainerId())
+        );
+
+        List<Trainer> unassignedAfter = facade.getUnassignedTrainersForTrainee(trainee.getUser().getUsername());
+        assertFalse(unassignedAfter.contains(trainer1));
+        assertTrue(unassignedAfter.contains(trainer2));
+
+        assertEquals(unassignedBefore.size() - 1, unassignedAfter.size());
     }
+
+    @Test
+    void testUpdateTraineeTrainersList() {
+        Trainee trainee = facade.createTraineeProfile(
+                Trainee.builder()
+                        .user(User.builder()
+                                .firstName("Alice")
+                                .lastName("Johnson")
+                                .build())
+                        .dateOfBirth(LocalDate.of(2000, 1, 1))
+                        .address("Tashkent")
+                        .build()
+        );
+
+        Trainer trainer1 = facade.createTrainerProfile(
+                Trainer.builder()
+                        .user(User.builder()
+                                .firstName("Bob")
+                                .lastName("Miller")
+                                .build())
+                        .specialization("Yoga")
+                        .build()
+        );
+
+        Trainer trainer2 = facade.createTrainerProfile(
+                Trainer.builder()
+                        .user(User.builder()
+                                .firstName("Emma")
+                                .lastName("Brown")
+                                .build())
+                        .specialization("Cardio")
+                        .build()
+        );
+
+        facade.updateTraineeTrainersList(
+                trainee.getUser().getUsername(),
+                List.of(trainer1.getTrainerId(), trainer2.getTrainerId())
+        );
+
+        Trainee updatedTrainee = facade.getTraineeByUsername(trainee.getUser().getUsername());
+
+        assertNotNull(updatedTrainee.getTrainers());
+        assertEquals(2, updatedTrainee.getTrainers().size());
+
+        List<String> assignedUsernames = updatedTrainee.getTrainers().stream()
+                .map(t -> t.getUser().getUsername())
+                .toList();
+
+        assertTrue(assignedUsernames.contains(trainer1.getUser().getUsername()));
+        assertTrue(assignedUsernames.contains(trainer2.getUser().getUsername()));
+    }
+
 }

@@ -122,11 +122,14 @@ public class GymFacade {
         Trainee trainee = traineeService.getDao().findByUsername(traineeUsername)
                 .orElseThrow(() -> new RuntimeException("Trainee not found: " + traineeUsername));
 
-        List<Trainer> allTrainers = trainerService.getAll();
         Set<Trainer> assigned = trainee.getTrainers();
+        if (assigned == null) {
+            assigned = Set.of();
+        }
 
-        return allTrainers.stream()
-                .filter(tr -> !assigned.contains(tr))
+        Set<Trainer> finalAssigned = assigned;
+        return trainerService.getAll().stream()
+                .filter(t -> !finalAssigned.contains(t))
                 .toList();
     }
 
