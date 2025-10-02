@@ -14,7 +14,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
@@ -117,12 +119,33 @@ public class GymFacade {
 
     @Transactional
     public List<Trainer> getUnassignedTrainersForTrainee(String traineeUsername) {
-        throw new UnsupportedOperationException("Not yet implemented");
+        Trainee trainee = traineeService.getDao().findByUsername(traineeUsername)
+                .orElseThrow(() -> new RuntimeException("Trainee not found: " + traineeUsername));
+
+        List<Trainer> allTrainers = trainerService.getAll();
+        Set<Trainer> assigned = trainee.getTrainers();
+
+        return allTrainers.stream()
+                .filter(tr -> !assigned.contains(tr))
+                .toList();
     }
 
     @Transactional
     public void updateTraineeTrainersList(String traineeUsername, List<UUID> trainerIds) {
-        throw new UnsupportedOperationException("Not yet implemented");
+        Trainee trainee = traineeService.getDao().findByUsername(traineeUsername)
+                .orElseThrow(() -> new RuntimeException("Trainee not found: " + traineeUsername));
+
+        Set<Trainer> trainers = trainerIds.stream()
+                .map(id -> trainerService.getDao().findById(id)
+                        .orElseThrow(() -> new RuntimeException("Trainer not found with id=" + id)))
+                .collect(Collectors.toSet());
+
+        trainee.setTrainers(trainers);
+        traineeService.getDao().update(trainee);
+
+        log.info("Updated trainee={} with trainers={}",
+                trainee.getUser().getUsername(),
+                trainers.stream().map(t -> t.getUser().getUsername()).toList());
     }
 
     @Transactional(readOnly = true)
