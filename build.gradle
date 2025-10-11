@@ -1,16 +1,13 @@
 plugins {
     id 'java'
-    id 'application'
+    id 'org.springframework.boot' version '3.3.4'
+    id 'io.spring.dependency-management' version '1.1.5'
 }
 
 java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(17)
     }
-}
-
-application {
-    mainClass = 'code.Main'
 }
 
 group = 'code'
@@ -20,51 +17,23 @@ repositories {
     mavenCentral()
 }
 
-ext {
-    springVersion     = '6.1.13'
-    jakartaVersion    = '3.1.0'
-    log4jVersion      = '2.24.1'
-    lombokVersion     = '1.18.34'
-    mockitoVersion    = '5.19.0'
-    assertjVersion    = '3.26.0'
-    junitVersion      = '5.11.3'
-    h2Version         = '2.2.224'
-    hibernateVersion  = '6.4.4.Final'
-}
 
 dependencies {
-    // Spring Core
-    implementation group: 'org.springframework', name: 'spring-core', version: springVersion
-    implementation group: 'org.springframework', name: 'spring-context', version: springVersion
-    implementation group: 'org.springframework', name: 'spring-beans', version: springVersion
-    implementation group: 'jakarta.persistence', name: 'jakarta.persistence-api', version: jakartaVersion
-    implementation group: 'org.springframework', name: 'spring-jdbc', version: springVersion
-    implementation group: 'org.springframework', name: 'spring-orm', version: springVersion
+    //Spring Boot starters
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 
-    // Hibernate ORM
-    implementation group: 'org.hibernate.orm', name: 'hibernate-core', version: hibernateVersion
-
-    // H2 Database
-    runtimeOnly group: 'com.h2database', name: 'h2', version: h2Version
-
-    // Logging
-    implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: log4jVersion
-    implementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: log4jVersion
+    // PostgreSQL Driver
+    runtimeOnly 'org.postgresql:postgresql'
 
     //Lombok
-    compileOnly group: 'org.projectlombok', name: 'lombok', version: lombokVersion
-    annotationProcessor group: 'org.projectlombok', name: 'lombok', version: lombokVersion
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
 
     // Testing
-    testImplementation group: 'org.springframework', name: 'spring-test', version: springVersion
-    testImplementation group: 'org.mockito', name: 'mockito-core', version: mockitoVersion
-    testImplementation group: 'org.assertj', name: 'assertj-core', version: assertjVersion
-    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: junitVersion
-    testRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: junitVersion
-}
-
-repositories {
-    mavenCentral()
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.mockito:mockito-core'
+    testImplementation 'org.assertj:assertj-core'
 }
 
 test {

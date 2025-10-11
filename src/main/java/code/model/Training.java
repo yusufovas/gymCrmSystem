@@ -35,10 +35,14 @@ public class Training {
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "trainee_id", nullable = false)
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private Trainee trainee;
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "trainer_id", nullable = false)
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private Trainer trainer;
 
     @Column(name = "training_name", nullable = false)
@@ -46,6 +50,8 @@ public class Training {
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "training_type_id", nullable = false)
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private TrainingType trainingType;
 
     @Column(name = "training_date", nullable = false)
